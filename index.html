@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechZone - Matériels Électroniques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Animation pour les cartes produits */
+        .product-card {
+            transition: all 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Animation pour le bouton d'ajout au panier */
+        .add-to-cart {
+            transition: all 0.2s ease;
+        }
+        .add-to-cart:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Style personnalisé pour le compteur du panier */
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        /* Animation pour le menu mobile */
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        .mobile-menu {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Barre de navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-laptop-code text-2xl text-blue-600"></i>
+                    <span class="text-xl font-bold text-gray-800">TechZone</span>
+                </div>
+                
+                <!-- Menu principal (desktop) -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="text-blue-600 font-medium">Accueil</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">Produits</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">Promotions</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">À propos</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">Contact</a>
+                </div>
+                
+                <!-- Icônes de droite -->
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button id="cart-button" class="text-gray-600 hover:text-blue-600 relative">
+                            <i class="fas fa-shopping-cart text-xl"></i>
+                            <span id="cart-count" class="cart-count hidden">0</span>
+                        </button>
+                    </div>
+                    <button class="md:hidden text-gray-600" id="mobile-menu-button">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Menu mobile -->
+        <div id="mobile-menu" class="mobile-menu hidden md:hidden bg-white absolute top-16 right-0 w-64 h-screen shadow-lg p-4">
+            <div class="flex flex-col space-y-4">
+                <a href="#" class="text-blue-600 font-medium">Accueil</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600">Produits</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600">Promotions</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600">À propos</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600">Contact</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Panier latéral -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+        <div class="p-4">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h2 class="text-xl font-bold">Votre Panier</h2>
+                <button id="close-cart" class="text-gray-500 hover:text-red-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="cart-items" class="py-4">
+                <!-- Les éléments du panier seront ajoutés ici dynamiquement -->
+                <p class="text-gray-500 text-center py-8">Votre panier est vide</p>
+            </div>
+            
+            <div class="border-t pt-4">
+                <div class="flex justify-between mb-4">
+                    <span class="font-medium">Total:</span>
+                    <span id="cart-total" class="font-bold">0 €</span>
+                </div>
+                <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+                    Passer la commande
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overlay pour le panier/menu mobile -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+    
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Découvrez nos derniers matériels électroniques</h1>
+                    <p class="text-xl mb-6">Des produits high-tech de qualité à des prix imbattables.</p>
+                    <button class="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition">
+                        Voir les produits
+                    </button>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                         alt="Électronique" class="rounded-lg shadow-xl max-h-80 object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Catégories -->
+    <section class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Nos Catégories</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:bg-blue-50 transition cursor-pointer">
+                    <i class="fas fa-laptop text-4xl text-blue-600 mb-3"></i>
+                    <h3 class="font-medium">Ordinateurs</h3>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:bg-blue-50 transition cursor-pointer">
+                    <i class="fas fa-mobile-alt text-4xl text-blue-600 mb-3"></i>
+                    <h3 class="font-medium">Smartphones</h3>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:bg-blue-50 transition cursor-pointer">
+                    <i class="fas fa-tablet-alt text-4xl text-blue-600 mb-3"></i>
+                    <h3 class="font-medium">Tablettes</h3>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:bg-blue-50 transition cursor-pointer">
+                    <i class="fas fa-headphones text-4xl text-blue-600 mb-3"></i>
+                    <h3 class="font-medium">Accessoires</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Produits populaires -->
+    <section class="py-12 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold">Produits Populaires</h2>
+                <a href="#" class="text-blue-600 hover:underline">Voir tout</a>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Produit 1 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden product-card">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" 
+                             alt="Laptop" class="w-full h-48 object-cover">
+                        <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                            -15%
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1">Laptop Ultra Slim</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">(42)</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-gray-500 line-through text-sm">999 €</span>
+                                <span class="text-blue-600 font-bold text-lg ml-2">849 €</span>
+                            </div>
+                            <button class="add-to-cart bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700" 
+                                    data-id="1" data-name="Laptop Ultra Slim" data-price="849" data-image="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Produit 2 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden product-card">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                             alt="Smartphone" class="w-full h-48 object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1">Smartphone Pro X</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">(36)</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-blue-600 font-bold text-lg">699 €</span>
+                            </div>
+                            <button class="add-to-cart bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700" 
+                                    data-id="2" data-name="Smartphone Pro X" data-price="699" data-image="https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Produit 3 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden product-card">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1544244015-0d4a22a2e7ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                             alt="Tablette" class="w-full h-48 object-cover">
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1">Tablette Elite</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">(28)</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-blue-600 font-bold text-lg">499 €</span>
+                            </div>
+                            <button class="add-to-cart bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700" 
+                                    data-id="3" data-name="Tablette Elite" data-price="499" data-image="https://images.unsplash.com/photo-1544244015-0d4a22a2e7ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Produit 4 -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden product-card">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                             alt="Écouteurs" class="w-full h-48 object-cover">
+                        <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                            -20%
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold
+</body>
+</html>
